@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UrbanStyle — Магазин одежды</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0; padding: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(120deg, #e0e7ef 0%, #f9fafc 60%, #c2e9fb 100%),
+        url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1500&q=80') center/cover no-repeat fixed;
+      color: #222;
+      background-blend-mode: lighten;
+      animation: bgMove 24s linear infinite alternate;
+    }
+    @keyframes bgMove {
+      0% { background-position: center 0, center 0; }
+      100% { background-position: center 0, center 60px; }
+    }
+    header {
+      background: url('https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat, linear-gradient(90deg, #111 60%, #2d2d2d 100%);
+      color: #fff;
+      padding: 60px 20px 40px 20px;
+      text-align: center;
+      letter-spacing: 2px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.13);
+      position: relative;
+    }
+    header::after {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; right: 0; bottom: 0;
+      background: rgba(20,20,20,0.55);
+      z-index: 1;
+    }
+    header > * {
+      position: relative;
+      z-index: 2;
+    }
+    header h1 {
+      font-size: 3.2rem;
+      margin-bottom: 12px;
+      letter-spacing: 4px;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.18);
+    }
+    nav {
+      background: #fff;
+      padding: 14px 0 12px 0;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    /* Cart floating button */
+    #cart-fab {
+      position: fixed;
+      right: 32px;
+      bottom: 32px;
+      background: #0077c2;
+      color: #fff;
+      border-radius: 50%;
+      width: 64px;
+      height: 64px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.1rem;
+      cursor: pointer;
+      z-index: 1001;
+      border: none;
+      outline: none;
+      transition: background 0.18s, transform 0.18s;
+      animation: cartFabAppear 0.7s cubic-bezier(.4,1.6,.6,1);
+    }
+    #cart-fab:hover {
+      background: #1a8a34;
+      transform: scale(1.08) rotate(-6deg);
+    }
+    #cart-fab .fab-count {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      background: #e74c3c;
+      color: #fff;
+      border-radius: 50%;
+      font-size: 1.05rem;
+      font-weight: bold;
+      padding: 2px 8px;
+      min-width: 24px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+      border: 2px solid #fff;
+      transition: transform 0.18s;
+      pointer-events: none;
+    }
+    @keyframes cartFabAppear {
+      0% { opacity: 0; transform: scale(0.7) translateY(60px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    nav a {
+      color: #222;
+      margin: 0 18px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.08rem;
+      transition: color 0.2s;
+    }
+    nav a:hover {
+      color: #0077c2;
+    }
+    section {
+      padding: 50px 10px 40px 10px;
+      max-width: 1200px;
+      margin: auto;
+    }
+    h2 {
+      margin-bottom: 30px;
+      font-size: 2rem;
+      color: #222;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+    .products {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+      align-items: start;
+    }
+    .product {
+      background: none;
+      padding: 0;
+      border-radius: 16px;
+      box-shadow: none;
+      text-align: center;
+      border: none;
+      position: relative;
+      overflow: visible;
+      width: auto;
+      min-width: 0;
+      min-height: 0;
+      transition: transform 0.22s cubic-bezier(.4,1.6,.6,1), box-shadow 0.22s cubic-bezier(.4,1.6,.6,1);
+      display: inline-block;
+      will-change: transform, box-shadow;
+      cursor: pointer;
+      animation: tileAppear 0.7s cubic-bezier(.4,1.6,.6,1);
+    }
+    .product:hover {
+      transform: translateY(-10px) scale(1.04) rotate(-1deg);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      z-index: 2;
+    }
+    @keyframes tileAppear {
+      0% { opacity: 0; transform: scale(0.92) translateY(40px); }
+      80% { opacity: 1; transform: scale(1.05) translateY(-6px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .product-img-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.10);
+      overflow: hidden;
+      cursor: pointer;
+      border-radius: 16px;
+      background: #f3f3f3;
+      margin: 0;
+      padding: 0;
+      min-width: 0;
+      min-height: 0;
+      width: auto;
+      height: auto;
+      transition: box-shadow 0.18s;
+    }
+    .product-img-wrap img {
+      display: block;
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 320px;
+      object-fit: contain;
+      border-radius: 16px;
+      background: none;
+      transition: filter 0.25s, transform 0.25s cubic-bezier(.4,1.6,.6,1);
+    }
+    .product:hover .product-img-wrap {
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+    .product:hover .product-img-wrap img {
+      filter: brightness(0.7) blur(0.5px);
+      transform: scale(1.04);
+    }
+    .product .product-info {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      width: 100%;
+      padding: 0 0 0 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100%;
+    }
+    .product:hover .product-info {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .product .product-info h3 {
+      color: #fff;
+      font-size: 1.18rem;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      background: rgba(0,0,0,0.32);
+      border-radius: 8px;
+      padding: 4px 14px;
+      display: inline-block;
+    }
+    .product .product-info .desc {
+      color: #fff;
+      font-size: 1.02rem;
+      margin: 0 0 10px 0;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      background: rgba(0,0,0,0.22);
+      border-radius: 8px;
+      padding: 3px 12px;
+      display: inline-block;
+    }
+    .product .product-info .price {
+      color: #fff;
+      font-size: 1.13rem;
+      font-weight: bold;
+      margin: 0 0 12px 0;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.22);
+      background: rgba(0,0,0,0.22);
+      border-radius: 8px;
+      padding: 3px 12px;
+      display: inline-block;
+    }
+    .product .product-info .buy-btn {
+      background: #1a8a34;
+      color: #fff;
+      font-size: 1.08rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 28px;
+      margin-bottom: 18px;
+      margin-top: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+      opacity: 0.95;
+      transition: background 0.18s, color 0.18s, opacity 0.18s;
+      display: block;
+    }
+    .product .product-info .buy-btn:hover {
+      background: #0077c2;
+      color: #fff;
+      opacity: 1;
+    }
+    .img-fallback {
+      position: absolute;
+      left: 0; top: 0; right: 0; bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      color: #fff;
+      font-weight: bold;
+      background: linear-gradient(135deg, #0077c2 60%, #1a8a34 100%);
+      border-radius: 10px;
+      z-index: 2;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      letter-spacing: 2px;
+      padding: 0 10px;
+      text-align: center;
+      pointer-events: none;
+    }
+    .product h3 {
+      margin: 12px 0 8px;
+      font-size: 1.15rem;
+      font-weight: 600;
+    }
+    .product .brand {
+      font-size: 0.98rem;
+      color: #0077c2;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .product p {
+      margin: 0 0 8px 0;
+      font-size: 1.08rem;
+    }
+    .product .price {
+      font-size: 1.13rem;
+      font-weight: bold;
+      color: #1a8a34;
+      margin-bottom: 8px;
+    }
+    footer {
+      background: #111;
+      color: #fff;
+      text-align: center;
+      padding: 24px 10px 20px 10px;
+      margin-top: 60px;
+      font-size: 1.05rem;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>UrbanStyle</h1>
+  <p>Современная одежда для города</p>
+</header>
+
+<nav>
+  <a href="#" id="nav-home">Главная</a>
+  <a href="#" id="nav-catalog">Каталог</a>
+  <a href="#" id="nav-cart">Корзина <span id="cart-count" style="background:#0077c2;color:#fff;border-radius:8px;padding:2px 7px;font-size:0.95em;vertical-align:middle;">0</span></a>
+  <a href="#" id="nav-contact">Контакты</a>
+</nav>
+<!-- Floating Cart Button -->
+<button id="cart-fab" title="Корзина">
+  <span style="font-size:2.1rem;">🛒</span>
+  <span class="fab-count" id="cart-fab-count">0</span>
+</button>
+
+<main id="main-content">
+  <!-- Контент будет подгружаться динамически -->
+</main>
+  <template id="product-template">
+    <div class="product">
+      <div class="product-img-wrap">
+        <img src="" alt="" />
+        <div class="img-fallback" style="display:none"></div>
+      </div>
+      <div class="product-info">
+        <h3></h3>
+        <p class="price"></p>
+        <p class="desc"></p>
+        <button class="buy-btn">Купить</button>
+      </div>
+    </div>
+  </template>
+
+<footer>
+  &copy; 2025 UrbanStyle | Дизайн: Boris-arus
+</footer>
+
+<script>
+// Каталог товаров
+const products = [
+  {
+    name: 'Футболка белая',
+    price: 6990,
+    img: 'https://cdnkz.sportmaster.com/upload/mdm/media_content/resize/5e6/418_557_b410/103922690299.jpg',
+    desc: '100% хлопок, универсальный крой'
+  },
+  {
+    name: 'Футболка чёрная',
+    price: 6990,
+    img: 'https://streetwear.com.ua/img/p/full/220/8043220a.jpg',
+    desc: 'Мягкая ткань, базовая модель'
+  },
+  {
+    name: 'Джинсы синие',
+    price: 15990,
+    img: 'https://media.frgroup.kz/images/7e/8d/e83ae34e52e63131f10d1d2763bd.jpg',
+    desc: 'Классический деним, прямой крой'
+  },
+  {
+    name: 'Джинсы светлые',
+    price: 15990,
+    img: 'https://pic4.kidstaff.com.ua/pictures_user/10/88756/32001126/88756_20210803084456_9354_600x600.jpg',
+    desc: 'Светлый деним, комфортная посадка'
+  },
+  {
+    name: 'Худи серое',
+    price: 12990,
+    img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80', // Серое худи на парне
+    desc: 'Тёплый флис, капюшон'
+  },
+  {
+    name: 'Свитшот бежевый',
+    price: 11990,
+    img: 'https://images.prom.ua/6255495979_w600_h600_6255495979.jpg',
+    desc: 'Мягкий трикотаж, свободный крой'
+  },
+  {
+    name: 'Куртка демисезонная',
+    price: 24900,
+    img: 'https://cdn.intertop.com/load/mp462359/1600x2133/MAIN.jpg', // Демисезонная куртка
+    desc: 'Лёгкая, с подкладкой'
+  },
+  {
+    name: 'Поло светлое',
+    price: 9900,
+    img: 'https://media.brunellocucinelli.com/image/upload/f_auto,q_auto/t_bc_sfcc_v_image/v1732094850/prod/seecommerce/original/251M2L707715-CWO67-F.jpeg?_i=AG',
+    desc: 'Классический стиль, короткий рукав'
+  },
+  {
+    name: 'Шорты летние',
+    price: 7900,
+    img: 'https://images.prom.ua/4472680206_w640_h320_shorty-dlya-muzhchin.jpg',
+    desc: 'Лёгкая ткань, удобная посадка'
+  },
+  {
+    name: 'Пуховик зимний',
+    price: 39900,
+    img: 'https://static.snowqueen.ru/img/628/942/resizeWebP/catalog/product/s/l/sl_654031003_654056003-c_1.jpg',
+    desc: 'Тёплый, с капюшоном'
+  }
+];
+
+let cart = [];
+
+function renderHome() {
+  document.getElementById('main-content').innerHTML = `
+    <section>
+      <h2>Добро пожаловать в UrbanStyle</h2>
+      <p style="text-align:center;font-size:1.2rem;max-width:600px;margin:20px auto 0 auto;">Современная одежда от топовых брендов. Оформляйте покупки онлайн и следите за модой!</p>
+      <div style="display:flex;justify-content:center;margin-top:40px;gap:30px;flex-wrap:wrap;">
+        <div style="background:#fff;border-radius:14px;padding:30px 36px;box-shadow:0 2px 12px rgba(0,0,0,0.07);min-width:220px;">
+          <div style="font-size:2.2rem;">🛍️</div>
+          <div style="margin-top:10px;font-size:1.1rem;">Каталог одежды</div>
+        </div>
+        <div style="background:#fff;border-radius:14px;padding:30px 36px;box-shadow:0 2px 12px rgba(0,0,0,0.07);min-width:220px;">
+          <div style="font-size:2.2rem;">⭐</div>
+          <div style="margin-top:10px;font-size:1.1rem;">Только оригинальные бренды</div>
+        </div>
+        <div style="background:#fff;border-radius:14px;padding:30px 36px;box-shadow:0 2px 12px rgba(0,0,0,0.07);min-width:220px;">
+          <div style="font-size:2.2rem;">🚚</div>
+          <div style="margin-top:10px;font-size:1.1rem;">Доставка по Казахстану</div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderCatalog() {
+  let html = `<section><h2>Каталог</h2><div class="products">`;
+  products.forEach((p, i) => {
+    html += `<div class="product" data-id="${i}"></div>`;
+  });
+  html += '</div></section>';
+  document.getElementById('main-content').innerHTML = html;
+  // Вставляем карточки через template
+  document.querySelectorAll('.product').forEach((el, i) => {
+    const t = document.getElementById('product-template');
+    const node = t.content.cloneNode(true);
+    const img = node.querySelector('img');
+    const fallback = node.querySelector('.img-fallback');
+    img.src = products[i].img;
+    img.alt = products[i].name;
+    img.onerror = function() {
+      img.style.display = 'none';
+      fallback.style.display = 'flex';
+      fallback.innerHTML = `<span>${products[i].brand ? products[i].brand[0] : ''}</span><div style='font-size:1rem;font-weight:400;margin-top:6px;'>${products[i].name}</div>`;
+    };
+    // ...больше не нужен эффект оверлея...
+    // Заполняем карточку
+    node.querySelector('.img-fallback').style.display = 'none';
+    node.querySelector('h3').textContent = products[i].name;
+    node.querySelector('.price').textContent = products[i].price.toLocaleString() + '₸';
+    node.querySelector('.desc').textContent = products[i].desc;
+    node.querySelector('.buy-btn').setAttribute('data-id', i);
+    node.querySelector('.buy-btn').onclick = function() { addToCart(i); };
+    el.innerHTML = '';
+    el.appendChild(node);
+  });
+}
+
+function renderCart() {
+  let html = `<section><h2>Корзина</h2>`;
+  if (cart.length === 0) {
+    html += `<p style="text-align:center;font-size:1.1rem;">Корзина пуста</p>`;
+  } else {
+    html += `<div class="products">`;
+    cart.forEach((item, idx) => {
+      html += `<div class="product" data-id="${idx}"></div>`;
+    });
+    html += '</div>';
+    html += `<div style="text-align:right;font-size:1.2rem;margin:30px 0 0 0;">Итого: <b>${cart.reduce((s, p) => s + p.price, 0).toLocaleString()}₸</b></div>`;
+    html += `<div style="text-align:right;margin-top:18px;"><button id="order-btn" style="background:#1a8a34;color:#fff;font-size:1.1rem;padding:10px 28px;border-radius:8px;cursor:pointer;">Оформить заказ</button></div>`;
+  }
+  html += '</section>';
+  document.getElementById('main-content').innerHTML = html;
+  // Вставляем карточки через template
+  if (cart.length > 0) {
+    document.querySelectorAll('.product').forEach((el, idx) => {
+      const t = document.getElementById('product-template');
+      const node = t.content.cloneNode(true);
+      const img = node.querySelector('img');
+      const fallback = node.querySelector('.img-fallback');
+      img.src = cart[idx].img;
+      img.alt = cart[idx].name;
+      img.onerror = function() {
+        img.style.display = 'none';
+        fallback.style.display = 'flex';
+        fallback.innerHTML = `<span>${cart[idx].brand ? cart[idx].brand[0] : ''}</span><div style='font-size:1rem;font-weight:400;margin-top:6px;'>${cart[idx].name}</div>`;
+      };
+      node.querySelector('.img-fallback').style.display = 'none';
+      node.querySelector('h3').textContent = cart[idx].name;
+      node.querySelector('.price').textContent = cart[idx].price.toLocaleString() + '₸';
+      node.querySelector('.desc').textContent = cart[idx].desc;
+      const btn = node.querySelector('.buy-btn');
+      btn.textContent = 'Удалить';
+      btn.style.background = '#e74c3c';
+      btn.style.color = '#fff';
+      btn.onclick = function() { removeFromCart(idx); };
+      el.innerHTML = '';
+      el.appendChild(node);
+    });
+  }
+  // Кнопка оформления заказа
+  setTimeout(() => {
+    const orderBtn = document.getElementById('order-btn');
+    if (orderBtn) {
+      orderBtn.onclick = function() {
+        alert('Спасибо за заказ! Мы свяжемся с вами для подтверждения.');
+        cart = [];
+        updateCartCount();
+        renderCart();
+      };
+    }
+  }, 0);
+}
+
+function renderContact() {
+  document.getElementById('main-content').innerHTML = `
+    <section>
+      <h2>Контакты</h2>
+      <p style="text-align:center;font-size:1.1rem;">По всем вопросам: <a href="mailto:info@urbanstyle.kz">info@urbanstyle.kz</a><br>+7 (777) 123-45-67</p>
+    </section>
+  `;
+}
+
+function addToCart(id) {
+  cart.push(products[id]);
+  updateCartCount();
+  animateCart();
+}
+
+function removeFromCart(idx) {
+  cart.splice(idx, 1);
+  updateCartCount();
+  renderCart();
+}
+
+function updateCartCount() {
+  document.getElementById('cart-count').textContent = cart.length;
+  document.getElementById('cart-fab-count').textContent = cart.length;
+}
+
+function animateCart() {
+  const el = document.getElementById('cart-fab-count');
+  el.style.transform = 'scale(1.3)';
+  el.style.transition = 'transform 0.2s';
+  setTimeout(() => { el.style.transform = 'scale(1)'; }, 200);
+}
+
+// Навигация
+document.getElementById('nav-home').onclick = function(e) { e.preventDefault(); renderHome(); };
+document.getElementById('nav-catalog').onclick = function(e) { e.preventDefault(); renderCatalog(); };
+document.getElementById('nav-cart').onclick = function(e) { e.preventDefault(); renderCart(); };
+document.getElementById('nav-contact').onclick = function(e) { e.preventDefault(); renderContact(); };
+// FAB cart button
+document.getElementById('cart-fab').onclick = function(e) {
+  renderCart();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// По умолчанию — главная
+renderHome();
+
+// Анимированная кнопка «Каталог» на главной
+function injectCatalogButton() {
+  const main = document.getElementById('main-content');
+  if (!main) return;
+  // Проверяем, что сейчас главная
+  if (!main.querySelector('.catalog-cta')) {
+    const btn = document.createElement('button');
+    btn.className = 'catalog-cta';
+    btn.innerHTML = 'Каталог';
+    btn.onclick = function() {
+      renderCatalog();
+    };
+    main.appendChild(btn);
+    setTimeout(() => btn.classList.add('show'), 30);
+  }
+}
+
+// Модифицируем renderHome для вставки кнопки
+const origRenderHome = renderHome;
+renderHome = function() {
+  origRenderHome();
+  injectCatalogButton();
+};
+
+// Стили для анимированной кнопки
+const style = document.createElement('style');
+style.innerHTML = `
+  .catalog-cta {
+    display: block;
+    margin: 48px auto 0 auto;
+    padding: 22px 70px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(90deg, #0077c2 60%, #1a8a34 100%);
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+    transition: opacity 0.5s cubic-bezier(.4,1.6,.6,1), transform 0.5s cubic-bezier(.4,1.6,.6,1);
+    position: relative;
+    z-index: 2;
+    letter-spacing: 2px;
+    outline: none;
+    animation: none;
+  }
+  .catalog-cta.show {
+    opacity: 1;
+    transform: translateY(0) scale(1.04);
+    animation: ctaPulse 1.2s cubic-bezier(.4,1.6,.6,1);
+  }
+  .catalog-cta:hover {
+    background: linear-gradient(90deg, #1a8a34 60%, #0077c2 100%);
+    transform: scale(1.07) translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  }
+  @keyframes ctaPulse {
+    0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+    60% { opacity: 1; transform: translateY(-8px) scale(1.08); }
+    100% { opacity: 1; transform: translateY(0) scale(1.04); }
+  }
+`;
+document.head.appendChild(style);
+</script>
+</body>
+</html>
